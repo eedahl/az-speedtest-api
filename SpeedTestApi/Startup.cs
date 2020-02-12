@@ -26,6 +26,13 @@ namespace SpeedTestApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            var connectionString = Configuration.GetValue<string>("EventHub:ConnectionString");
+            var entityPath = Configuration.GetValue<string>("EventHub:EntityPath");
+            services.AddScoped<ISpeedTestEvents, SpeedTestEvents>(cts =>
+            {
+                return new SpeedTestEvents(connectionString, entityPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

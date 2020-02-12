@@ -13,10 +13,12 @@ namespace SpeedTestApi.Controllers
     public class SpeedTestController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly ISpeedTestEvents _eventHub;
 
-        public SpeedTestController(ILogger<SpeedTestController> logger)
+        public SpeedTestController(ILogger<SpeedTestController> logger, ISpeedTestEvents eventHub)
         {
             _logger = logger;
+            _eventHub = eventHub;
         }
 
         [Route("ping")]
@@ -29,8 +31,11 @@ namespace SpeedTestApi.Controllers
         [HttpPost]
         public string UploadSpeedTest([FromBody] TestResult speedTest)
         {
+            _eventHub.PublishSpeedTestEvents(speedTest);
+
             var response = $"Got a TestResult from { speedTest.User } with download { speedTest.Data.Speeds.Download } Mbps.";
             _logger.LogInformation(response);
+
             return response;
         }
     }
